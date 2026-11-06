@@ -75,7 +75,7 @@ const $=s=>document.querySelector(s);
 const nf=n=>n==null?'–':Math.round(n).toLocaleString('en-US');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const sum=a=>a.reduce((x,y)=>x+(y||0),0);
-let cur=N-1,tab=0,sub3=0,work=0,lastFact=-1;
+let cur=N-1,tab=0,sub3=0,work=0;
 // ---- helpers
 function chg(a,b,opt={}){ // plain-language change vs previous month
  if(b==null||a==null)return '<span class="fl">no earlier month</span>';
@@ -114,22 +114,6 @@ function showTab(){document.querySelectorAll('#nav button').forEach(b=>b.setAttr
 $('#mon').innerHTML=M.map((m,i)=>`<option value="${i}">${FULLM[i]} 2026</option>`).join('');$('#mon').value=cur;
 $('#mon').onchange=()=>{cur=+$('#mon').value;render()};
 $('#theme').onclick=()=>{const r=document.documentElement;const dk=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'};
-// ---- facts for "Surprise me"
-function facts(){
- const F=[],p=cur-1,im=D.totals.lpim,cl=D.totals.lpcl;
- if(p>=0){let best=null;D.selRows.forEach(r=>{const a=r.p[p],b=r.p[cur];if(a!=null&&b!=null&&(!best||a-b>best.d))best={k:r.k,d:a-b,a,b}});
-  if(best&&best.d>=1)F.push(`“${best.k}” climbed ${best.d.toFixed(1)} places in a month, from position ${best.a.toFixed(1)} to ${best.b.toFixed(1)}.`)}
- const nk=D.newKw.top[cur][0];if(nk)F.push(`Google tried IPG out for a brand new search term this month: “${nk.q}”. It was shown ${nf(nk.im)} times.`);
- const bestM=cl.indexOf(Math.max(...cl));F.push(cur===bestM?`${FULLM[cur]} is the best month so far for visits from Google (${nf(cl[cur])}).`:`The best month so far for visits was ${FULLM[bestM]} with ${nf(cl[bestM])}. ${FULLM[cur]} reached ${Math.round(cl[cur]/cl[bestM]*100)}% of that.`);
- if(p>=0){const g=D.topics.map(t=>({n:t.n,d:t.cl[cur]-t.cl[p]})).filter(x=>x.d>0).sort((a,b)=>b.d-a.d)[0];if(g)F.push(`${g.n} gained the most visits compared with ${FULLM[p]}: ${g.d} more.`)}
- const tp=D.pages.map(x=>({u:x.u,c:x.cl[cur]})).sort((a,b)=>b.c-a.c)[0];if(tp&&tp.c)F.push(`One page brought in ${Math.round(tp.c/cl[cur]*100)}% of all visits this month: ${tp.u}`);
- const gem=D.gems[Math.floor(Math.random()*Math.min(D.gems.length,10))];if(gem)F.push(`Hidden gem: people saw IPG for “${gem.q}” ${nf(gem.im)} times this year and nobody clicked. A better title could change that.`);
- F.push(`Out of every 100 times IPG showed up in Google in ${FULLM[cur]}, ${(cl[cur]/im[cur]*100).toFixed(1)} people clicked.`);
- const n1=D.selRows.filter(r=>r.p[cur]!=null&&r.p[cur]<=1.5).length;F.push(`${n1} of the ${D.selN} tracked keywords sit in the number 1 spot (or very close to it).`);
- if(cur>0){const np=newPages(cur);if(np.length)F.push(`${np.length} pages showed up in Google for the first time this month.`)}
- F.push(`That is about ${(cl[cur]/DAYS[cur]).toFixed(1)} visits from Google every day in ${FULLM[cur]}.`);
- return F}
-function surprise(){const F=facts();let i;do{i=Math.floor(Math.random()*F.length)}while(F.length>1&&i===lastFact);lastFact=i;$('#fact').textContent=F[i]}
 // ---- render
 function render(){s0();s1();s2();s3();s4();showTab()}
 function s0(){
@@ -141,16 +125,7 @@ function s0(){
  <div class="tile"><div class="l">Visits from Google</div><div class="v">${nf(cl[cur])}</div><div class="d">${chg(cl[cur],cl[p])}</div></div>
  <div class="tile"><div class="l">Keywords on page 1</div><div class="v">${z[cur][1]}</div><div class="d">${p>=0?chg(z[cur][1],z[p][1],{noPct:1}):''}</div></div>
  <div class="tile"><div class="l">New search terms</div><div class="v">${nf(nk[cur])}</div><div class="d">${p>=1?chg(nk[cur],nk[p],{noPct:1}):'<span class="fl">first month is the baseline</span>'}</div></div></div>
- <div class="card"><div class="sur"><div><h2>Surprise me</h2><div class="sub">A random fact from ${FULLM[cur]}'s numbers</div></div><div class="fact" id="fact"></div><button class="go" id="sb">Surprise me</button></div></div>
- <div class="card"><h2>Month by month</h2><div class="sub" style="margin-bottom:10px">${cm} is highlighted. The last column compares it with ${p>=0?FULLM[p]:'the month before'}.</div>${mom([
-  {l:'Times shown in Google',v:im},{l:'Visits from Google',v:cl},{l:'Click rate (%)',v:cl.map((c,i)=>+(c/im[i]*100).toFixed(2)),f:v=>v.toFixed(2),dec:2},
-  {l:'Keywords on page 1 (top 10)',v:z.map(x=>x[1])},{l:'Keywords in the top 3',v:z.map(x=>x[0])},{l:'New search terms',v:nk.map((v,i)=>i?v:null)},
-  {l:'Pages newly in Google',v:M.map((_,i)=>i?newPages(i).length:null)}])}</div>`;
- $('#s0').innerHTML=h;$('#sb').onclick=surprise;surprise()}
-function s1(){
- const z=D.zSel,p=cur-1,N0=D.selN,lab=['Top 3','Top 10 · page 1','Top 20 · page 2','Top 50','Top 100'];
- let h=`<div class="card"><h2>How many of our ${N0} tracked keywords rank well?</h2><div class="sub">Position 1 is the very top of Google. Page 1 of Google means positions 1 to 10.</div></div><div class="tiles">`+lab.map((l,i)=>`<div class="tile"><div class="l">${l}</div><div class="v">${z[cur][i]}</div><div class="d">${p>=0?chg(z[cur][i],z[p][i],{noPct:1}):''}</div></div>`).join('')+'</div>';
- h+=`<div class="grid2"><div class="card"><h3>Keywords on page 1, by month</h3><div id="c1"></div></div><div class="card"><h3>Keywords in the top 3, by month</h3><div id="c2"></div></div></div>`;
+`;
  const mv=D.selRows.filter(r=>p>=0&&r.p[p]!=null&&r.p[cur]!=null).map(r=>({k:r.k,a:r.p[p],b:r.p[cur],d:r.p[p]-r.p[cur]}));
  const up=mv.filter(x=>x.d>=1).sort((a,b)=>b.d-a.d).slice(0,6),dn=mv.filter(x=>x.d<=-1).sort((a,b)=>a.d-b.d).slice(0,6);
  const li=(a,s)=>a.length?'<ol class="list">'+a.map(x=>`<li><b>${esc(x.k)}</b> <span class="sub">${x.a.toFixed(1)} → ${x.b.toFixed(1)}</span> <span class="${s}">${s==='up'?'▲':'▼'} ${Math.abs(x.d).toFixed(1)}</span></li>`).join('')+'</ol>':'<span class="sub">None moved by a full place this month.</span>';
