@@ -124,8 +124,15 @@ function s0(){
  <div class="tile"><div class="l">Times shown in Google</div><div class="v">${nf(im[cur])}</div><div class="d">${chg(im[cur],im[p])}</div></div>
  <div class="tile"><div class="l">Visits from Google</div><div class="v">${nf(cl[cur])}</div><div class="d">${chg(cl[cur],cl[p])}</div></div>
  <div class="tile"><div class="l">Keywords on page 1</div><div class="v">${z[cur][1]}</div><div class="d">${p>=0?chg(z[cur][1],z[p][1],{noPct:1}):''}</div></div>
- <div class="tile"><div class="l">New search terms</div><div class="v">${nf(nk[cur])}</div><div class="d">${p>=1?chg(nk[cur],nk[p],{noPct:1}):'<span class="fl">first month is the baseline</span>'}</div></div></div>
-`;
+ <div class="tile"><div class="l">New search terms</div><div class="v">${nf(nk[cur])}</div><div class="d">${p>=1?chg(nk[cur],nk[p],{noPct:1}):'<span class="fl">first month is the baseline</span>'}</div></div></div> <div class="card"><h2>Month by month</h2><div class="sub" style="margin-bottom:10px">${cm} is highlighted. The last column compares it with ${p>=0?FULLM[p]:'the month before'}.</div>${mom([
+  {l:'Times shown in Google',v:im},{l:'Visits from Google',v:cl},{l:'Click rate (%)',v:cl.map((c,i)=>+(c/im[i]*100).toFixed(2)),f:v=>v.toFixed(2),dec:2},
+  {l:'Keywords on page 1 (top 10)',v:z.map(x=>x[1])},{l:'Keywords in the top 3',v:z.map(x=>x[0])},{l:'New search terms',v:nk.map((v,i)=>i?v:null)},
+  {l:'Pages newly in Google',v:M.map((_,i)=>i?newPages(i).length:null)}])}</div>`;
+ $('#s0').innerHTML=h}
+function s1(){
+ const z=D.zSel,p=cur-1,N0=D.selN,lab=['Top 3','Top 10 · page 1','Top 20 · page 2','Top 50','Top 100'];
+ let h=`<div class="card"><h2>How many of our ${N0} tracked keywords rank well?</h2><div class="sub">Position 1 is the very top of Google. Page 1 of Google means positions 1 to 10.</div></div><div class="tiles">`+lab.map((l,i)=>`<div class="tile"><div class="l">${l}</div><div class="v">${z[cur][i]}</div><div class="d">${p>=0?chg(z[cur][i],z[p][i],{noPct:1}):''}</div></div>`).join('')+'</div>';
+ h+=`<div class="grid2"><div class="card"><h3>Keywords on page 1, by month</h3><div id="c1"></div></div><div class="card"><h3>Keywords in the top 3, by month</h3><div id="c2"></div></div></div>`;
  const mv=D.selRows.filter(r=>p>=0&&r.p[p]!=null&&r.p[cur]!=null).map(r=>({k:r.k,a:r.p[p],b:r.p[cur],d:r.p[p]-r.p[cur]}));
  const up=mv.filter(x=>x.d>=1).sort((a,b)=>b.d-a.d).slice(0,6),dn=mv.filter(x=>x.d<=-1).sort((a,b)=>a.d-b.d).slice(0,6);
  const li=(a,s)=>a.length?'<ol class="list">'+a.map(x=>`<li><b>${esc(x.k)}</b> <span class="sub">${x.a.toFixed(1)} → ${x.b.toFixed(1)}</span> <span class="${s}">${s==='up'?'▲':'▼'} ${Math.abs(x.d).toFixed(1)}</span></li>`).join('')+'</ol>':'<span class="sub">None moved by a full place this month.</span>';
