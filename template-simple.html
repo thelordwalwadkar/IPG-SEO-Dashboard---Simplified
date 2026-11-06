@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>IPG SEO Dashboard - Simplified</title>
+<style>
+/* Layout: one calm column. Report month on top, five tabs, plain-language headlines, tables for month-on-month history. */
+:root{--bg:#f4f5f2;--card:#fff;--ink:#17201e;--ink2:#4b5753;--mute:#7a8681;--line:#dfe4e0;--acc:#0f766e;--acc-soft:#d7ece9;--bar:#bfd9d5;--up:#17803d;--dn:#b42318;--warn:#8a5a00;--warnbg:#fff4d6;--warnline:#e6c46a}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e1413;--card:#151d1b;--ink:#e7eeeb;--ink2:#aebab5;--mute:#82908a;--line:#26322f;--acc:#4fd1c0;--acc-soft:#16403b;--bar:#2a4a45;--up:#5fd68d;--dn:#ff8f85;--warn:#ecc25e;--warnbg:#2c2410;--warnline:#6b5518}}
+:root[data-theme=dark]{--bg:#0e1413;--card:#151d1b;--ink:#e7eeeb;--ink2:#aebab5;--mute:#82908a;--line:#26322f;--acc:#4fd1c0;--acc-soft:#16403b;--bar:#2a4a45;--up:#5fd68d;--dn:#ff8f85;--warn:#ecc25e;--warnbg:#2c2410;--warnline:#6b5518}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+h1{font-size:22px;margin:0;letter-spacing:-.3px}h2{font-size:17px;margin:0 0 4px}h3{font-size:14px;margin:0 0 8px;color:var(--ink2)}
+.sub{color:var(--mute);font-size:13px}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,button{font:inherit}
+select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+nav button{border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:9px 14px;border-radius:99px;cursor:pointer;font-weight:600}
+nav button[aria-selected=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+nav .grp{align-self:center;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 4px 0 10px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.hero{font-size:19px;line-height:1.45;font-weight:600;letter-spacing:-.2px}.hero b{color:var(--acc)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.tile .l{font-size:13px;color:var(--ink2)}.tile .v{font-size:30px;font-weight:700;letter-spacing:-.8px;line-height:1.15;margin:2px 0}.tile .d{font-size:13px}
+.up{color:var(--up);font-weight:600}.dn{color:var(--dn);font-weight:600}.fl{color:var(--mute)}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:480px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:13.5px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{position:sticky;top:0;background:var(--card);z-index:2;color:var(--ink2);font-weight:600}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);z-index:1}th:first-child{z-index:3}
+th.sel,td.sel{background:var(--acc-soft);font-weight:700}
+tr.tot td{font-weight:700;border-top:2px solid var(--line)}
+td.l{text-align:left;white-space:normal;min-width:200px}
+.note{background:var(--warnbg);border:1px solid var(--warnline);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+.note b{color:var(--warn)}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--warnbg);color:var(--warn);border:1px solid var(--warnline);margin-left:8px;vertical-align:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.chart{width:100%;height:auto;display:block}.chart text{fill:var(--mute);font-size:11px}.chart .v{fill:var(--ink2)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin-bottom:12px}
+.seg button{background:var(--card);border:0;border-right:1px solid var(--line);color:var(--ink2);padding:7px 14px;cursor:pointer;font-weight:600}
+.seg button:last-child{border:0}.seg button[aria-pressed=true]{background:var(--acc);color:#fff}
+.sur{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.sur .fact{flex:1;min-width:240px;font-size:18px;font-weight:600;line-height:1.4}
+.go{background:var(--acc);color:#fff;border:0;border-radius:99px;padding:10px 18px;font-weight:700;cursor:pointer}
+.go:focus-visible,nav button:focus-visible,select:focus-visible,.seg button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.stage{border-top:4px solid var(--acc);}
+.stage h3{color:var(--ink);font-size:15px;margin:0}.stage .why{font-size:13px;color:var(--mute);margin:2px 0 8px}
+.stage ul{margin:0;padding-left:18px}.stage li{margin:4px 0}.stage small{color:var(--mute)}
+.big{font-size:28px;font-weight:700;color:var(--acc)}
+ol.list{margin:0;padding-left:20px}ol.list li{margin:4px 0}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;background:var(--acc-soft);color:var(--ink);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header>
+  <div><h1>IPG SEO dashboard</h1><div class="sub">industrialpumps.nl · what happened in Google, month by month</div></div>
+  <div class="ctl"><label class="sub" for="mon">Report month</label><select id="mon" aria-label="Report month"></select><button class="go" id="theme" style="background:var(--card);color:var(--ink2);border:1px solid var(--line);padding:8px 12px">Light / dark</button></div>
+ </header>
+ <nav id="nav" role="tablist"></nav>
+ <section id="s0"></section><section id="s1"></section><section id="s2"></section><section id="s3"></section><section id="s4"></section>
+ <p class="sub">Source: Google Search Console (Jan–Oct 2026) and the IPG keyword research list. Numbers marked “example” are illustrative, not measured.</p>
+</div>
+<script>
+const D=__DATA__, WORK=__WORK__;
+const M=D.months,N=M.length,FULLM=['January','February','March','April','May','June','July','August','September','October'],DAYS=[31,28,31,30,31,30,31,31,30,31];
+const $=s=>document.querySelector(s);
+const nf=n=>n==null?'–':Math.round(n).toLocaleString('en-US');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sum=a=>a.reduce((x,y)=>x+(y||0),0);
+let cur=N-1,tab=0,sub3=0,work=0,lastFact=-1;
+// ---- helpers
+function chg(a,b,opt={}){ // plain-language change vs previous month
+ if(b==null||a==null)return '<span class="fl">no earlier month</span>';
+ const d=a-b,lower=opt.lower;if(Math.abs(d)<1e-9)return '<span class="fl">same as '+FULLM[cur-1]+'</span>';
+ const good=lower?d<0:d>0;const p=b?Math.abs(d/b*100):null;
+ const txt=opt.unit==='pts'?Math.abs(d).toFixed(1)+' pts':opt.pctOnly?'':(opt.dec?Math.abs(d).toFixed(1):nf(Math.abs(d)));
+ const extra=!opt.noPct&&p!=null&&opt.unit!=='pts'?` (${p.toFixed(0)}%)`:'';
+ return `<span class="${good?'up':'dn'}">${d>0?'▲':'▼'} ${txt}${extra}</span> <span class="fl">vs ${FULLM[cur-1]}</span>`}
+function delta(a,b,opt={}){if(a==null||b==null)return '–';const d=a-b;if(Math.abs(d)<1e-9)return '<span class="fl">0</span>';const good=opt.lower?d<0:d>0;const s=opt.dec?Math.abs(d).toFixed(opt.dec):nf(Math.abs(d));return `<span class="${good?'up':'dn'}">${d>0?'▲':'▼'} ${s}</span>`}
+function bars(el,vals,fmt=nf,startAt=0){
+ const W=600,H=210,L=8,B=24,T=22,n=vals.length,bw=(W-L*2)/n,mx=Math.max(...vals,1);let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Monthly chart">`;
+ s+=`<line x1="${L}" x2="${W-L}" y1="${H-B}" y2="${H-B}" stroke="var(--line)"/>`;
+ vals.forEach((v,i)=>{const h=(H-B-T)*v/mx,x=L+i*bw+bw*.16,w=bw*.68,y=H-B-h,c=i===cur?'var(--acc)':'var(--bar)';
+  s+=`<rect x="${x}" y="${y}" width="${w}" height="${Math.max(h,0)}" rx="4" fill="${c}"><title>${FULLM[i]}: ${fmt(v)}</title></rect><text class="v" x="${x+w/2}" y="${y-5}" text-anchor="middle" style="${i===cur?'font-weight:700;fill:var(--ink)':''}">${fmt(v)}</text><text x="${x+w/2}" y="${H-8}" text-anchor="middle" style="${i===cur?'font-weight:700;fill:var(--ink)':''}">${M[i]}</text>`});
+ el.innerHTML=s+'</svg>'}
+function mom(rows,first='Measure'){ // rows: {l,v[],f?,lower?,dec?}
+ let h=`<div class="tw"><table><thead><tr><th>${first}</th>${M.map((m,i)=>`<th class="${i===cur?'sel':''}">${m}</th>`).join('')}<th>vs ${cur?M[cur-1]:'–'}</th></tr></thead><tbody>`;
+ rows.forEach(r=>{const f=r.f||nf;h+=`<tr><td>${r.l}</td>${r.v.map((v,i)=>`<td class="${i===cur?'sel':''}">${v==null?'–':f(v)}</td>`).join('')}<td>${cur?delta(r.v[cur],r.v[cur-1],{lower:r.lower,dec:r.dec}):'–'}</td></tr>`});
+ return h+'</tbody></table></div>'}
+function topicTable(rows,key,extraRow){
+ let h=`<div class="tw"><table><thead><tr><th>Topic</th>${M.map((m,i)=>`<th class="${i===cur?'sel':''}">${m}</th>`).join('')}<th>vs ${cur?M[cur-1]:'–'}</th></tr></thead><tbody>`;
+ rows.forEach(r=>{const v=r[key];h+=`<tr><td>${esc(r.n)}</td>${v.map((x,i)=>`<td class="${i===cur?'sel':''}">${nf(x)}</td>`).join('')}<td>${cur?delta(v[cur],v[cur-1]):'–'}</td></tr>`});
+ if(extraRow)h+=extraRow;return h+'</tbody></table></div>'}
+// ---- illustrative engagement + conversion (example data, seeded so it never changes between visits)
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R=rng(2026),EX={sess:[],dur:[],pps:[],eng:[],conv:[],enq:[],form:[],quote:[],call:[]};
+D.totals.lpcl.forEach((c,m)=>{const s=Math.round(c*(1.1+R()*.08));EX.sess.push(s);EX.dur.push(Math.round(98+R()*46));EX.pps.push(+(1.7+R()*.55).toFixed(2));EX.eng.push(+(52+R()*11).toFixed(1));
+ const cv=+(1.6+R()*1.6).toFixed(2);EX.conv.push(cv);const e=Math.max(1,Math.round(s*cv/100));EX.enq.push(e);const f=Math.round(e*(.45+R()*.1)),q=Math.round(e*(.3+R()*.08));EX.form.push(f);EX.quote.push(q);EX.call.push(Math.max(e-f-q,0))});
+const mmss=s=>Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0');
+const newPages=m=>D.pages.filter(p=>p.f===m);
+// ---- tabs
+const TABS=['Month at a glance','Rankings','Discoverability','Traffic','Work done'];
+$('#nav').innerHTML=TABS.map((t,i)=>(i===1?'<span class="grp">Keywords</span>':i===3?'<span class="grp">Traffic</span>':i===4?'<span class="grp">Activity</span>':'')+`<button role="tab" data-i="${i}" aria-selected="${i===0}">${t}</button>`).join('');
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=+b.dataset.i;showTab()};
+function showTab(){document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-selected',+b.dataset.i===tab));document.querySelectorAll('section').forEach((s,i)=>s.classList.toggle('on',i===tab))}
+$('#mon').innerHTML=M.map((m,i)=>`<option value="${i}">${FULLM[i]} 2026</option>`).join('');$('#mon').value=cur;
+$('#mon').onchange=()=>{cur=+$('#mon').value;render()};
+$('#theme').onclick=()=>{const r=document.documentElement;const dk=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'};
+// ---- facts for "Surprise me"
+function facts(){
+ const F=[],p=cur-1,im=D.totals.lpim,cl=D.totals.lpcl;
+ if(p>=0){let best=null;D.selRows.forEach(r=>{const a=r.p[p],b=r.p[cur];if(a!=null&&b!=null&&(!best||a-b>best.d))best={k:r.k,d:a-b,a,b}});
+  if(best&&best.d>=1)F.push(`“${best.k}” climbed ${best.d.toFixed(1)} places in a month, from position ${best.a.toFixed(1)} to ${best.b.toFixed(1)}.`)}
+ const nk=D.newKw.top[cur][0];if(nk)F.push(`Google tried IPG out for a brand new search term this month: “${nk.q}”. It was shown ${nf(nk.im)} times.`);
+ const bestM=cl.indexOf(Math.max(...cl));F.push(cur===bestM?`${FULLM[cur]} is the best month so far for visits from Google (${nf(cl[cur])}).`:`The best month so far for visits was ${FULLM[bestM]} with ${nf(cl[bestM])}. ${FULLM[cur]} reached ${Math.round(cl[cur]/cl[bestM]*100)}% of that.`);
+ if(p>=0){const g=D.topics.map(t=>({n:t.n,d:t.cl[cur]-t.cl[p]})).filter(x=>x.d>0).sort((a,b)=>b.d-a.d)[0];if(g)F.push(`${g.n} gained the most visits compared with ${FULLM[p]}: ${g.d} more.`)}
+ const tp=D.pages.map(x=>({u:x.u,c:x.cl[cur]})).sort((a,b)=>b.c-a.c)[0];if(tp&&tp.c)F.push(`One page brought in ${Math.round(tp.c/cl[cur]*100)}% of all visits this month: ${tp.u}`);
+ const gem=D.gems[Math.floor(Math.random()*Math.min(D.gems.length,10))];if(gem)F.push(`Hidden gem: people saw IPG for “${gem.q}” ${nf(gem.im)} times this year and nobody clicked. A better title could change that.`);
+ F.push(`Out of every 100 times IPG showed up in Google in ${FULLM[cur]}, ${(cl[cur]/im[cur]*100).toFixed(1)} people clicked.`);
+ const n1=D.selRows.filter(r=>r.p[cur]!=null&&r.p[cur]<=1.5).length;F.push(`${n1} of the ${D.selN} tracked keywords sit in the number 1 spot (or very close to it).`);
+ if(cur>0){const np=newPages(cur);if(np.length)F.push(`${np.length} pages showed up in Google for the first time this month.`)}
+ F.push(`That is about ${(cl[cur]/DAYS[cur]).toFixed(1)} visits from Google every day in ${FULLM[cur]}.`);
+ return F}
+function surprise(){const F=facts();let i;do{i=Math.floor(Math.random()*F.length)}while(F.length>1&&i===lastFact);lastFact=i;$('#fact').textContent=F[i]}
+// ---- render
+function render(){s0();s1();s2();s3();s4();showTab()}
+function s0(){
+ const cl=D.totals.lpcl,im=D.totals.lpim,p=cur-1,z=D.zSel,nk=D.newKw.counts,cm=FULLM[cur];
+ const word=(a,b,u)=>b==null?'':a>b?`up ${Math.round((a-b)/b*100)}% on ${FULLM[p]}`:a<b?`down ${Math.round((b-a)/b*100)}% on ${FULLM[p]}`:`level with ${FULLM[p]}`;
+ let h=`<div class="card hero">In ${cm}, IPG appeared in Google <b>${nf(im[cur])} times</b> (${word(im[cur],im[p])}) and <b>${nf(cl[cur])} people clicked</b> through to the website (${word(cl[cur],cl[p])}). <b>${z[cur][1]} of ${D.selN}</b> tracked keywords are on page 1 of Google, and Google showed IPG for <b>${nf(nk[cur])} new search terms</b>.</div>
+ <div class="tiles">
+ <div class="tile"><div class="l">Times shown in Google</div><div class="v">${nf(im[cur])}</div><div class="d">${chg(im[cur],im[p])}</div></div>
+ <div class="tile"><div class="l">Visits from Google</div><div class="v">${nf(cl[cur])}</div><div class="d">${chg(cl[cur],cl[p])}</div></div>
+ <div class="tile"><div class="l">Keywords on page 1</div><div class="v">${z[cur][1]}</div><div class="d">${p>=0?chg(z[cur][1],z[p][1],{noPct:1}):''}</div></div>
+ <div class="tile"><div class="l">New search terms</div><div class="v">${nf(nk[cur])}</div><div class="d">${p>=1?chg(nk[cur],nk[p],{noPct:1}):'<span class="fl">first month is the baseline</span>'}</div></div></div>
+ <div class="card"><div class="sur"><div><h2>Surprise me</h2><div class="sub">A random fact from ${FULLM[cur]}'s numbers</div></div><div class="fact" id="fact"></div><button class="go" id="sb">Surprise me</button></div></div>
+ <div class="card"><h2>Month by month</h2><div class="sub" style="margin-bottom:10px">${cm} is highlighted. The last column compares it with ${p>=0?FULLM[p]:'the month before'}.</div>${mom([
+  {l:'Times shown in Google',v:im},{l:'Visits from Google',v:cl},{l:'Click rate (%)',v:cl.map((c,i)=>+(c/im[i]*100).toFixed(2)),f:v=>v.toFixed(2),dec:2},
+  {l:'Keywords on page 1 (top 10)',v:z.map(x=>x[1])},{l:'Keywords in the top 3',v:z.map(x=>x[0])},{l:'New search terms',v:nk.map((v,i)=>i?v:null)},
+  {l:'Pages newly in Google',v:M.map((_,i)=>i?newPages(i).length:null)}])}</div>`;
+ $('#s0').innerHTML=h;$('#sb').onclick=surprise;surprise()}
+function s1(){
+ const z=D.zSel,p=cur-1,N0=D.selN,lab=['Top 3','Top 10 · page 1','Top 20 · page 2','Top 50','Top 100'];
+ let h=`<div class="card"><h2>How many of our ${N0} tracked keywords rank well?</h2><div class="sub">Position 1 is the very top of Google. Page 1 of Google means positions 1 to 10.</div></div><div class="tiles">`+lab.map((l,i)=>`<div class="tile"><div class="l">${l}</div><div class="v">${z[cur][i]}</div><div class="d">${p>=0?chg(z[cur][i],z[p][i],{noPct:1}):''}</div></div>`).join('')+'</div>';
+ h+=`<div class="grid2"><div class="card"><h3>Keywords on page 1, by month</h3><div id="c1"></div></div><div class="card"><h3>Keywords in the top 3, by month</h3><div id="c2"></div></div></div>`;
+ const mv=D.selRows.filter(r=>p>=0&&r.p[p]!=null&&r.p[cur]!=null).map(r=>({k:r.k,a:r.p[p],b:r.p[cur],d:r.p[p]-r.p[cur]}));
+ const up=mv.filter(x=>x.d>=1).sort((a,b)=>b.d-a.d).slice(0,6),dn=mv.filter(x=>x.d<=-1).sort((a,b)=>a.d-b.d).slice(0,6);
+ const li=(a,s)=>a.length?'<ol class="list">'+a.map(x=>`<li><b>${esc(x.k)}</b> <span class="sub">${x.a.toFixed(1)} → ${x.b.toFixed(1)}</span> <span class="${s}">${s==='up'?'▲':'▼'} ${Math.abs(x.d).toFixed(1)}</span></li>`).join('')+'</ol>':'<span class="sub">None moved by a full place this month.</span>';
+ h+=`<div class="grid2"><div class="card"><h2>Biggest climbers</h2><div class="sub" style="margin-bottom:8px">Tracked keywords that moved up the most since ${p>=0?FULLM[p]:'last month'}</div>${li(up,'up')}</div><div class="card"><h2>Biggest slips</h2><div class="sub" style="margin-bottom:8px">Tracked keywords that moved down the most</div>${li(dn,'dn')}</div></div>`;
+ h+=`<div class="card"><h2>Keywords per zone, month by month</h2><div class="sub" style="margin-bottom:10px">Cumulative: the top 10 includes the top 3.</div>${mom(lab.map((l,i)=>({l,v:z.map(x=>x[i])})),'Zone')}</div>`;
+ const tr=D.topics.filter(t=>sum(t.z)>0).sort((a,b)=>sum(b.cl)-sum(a.cl));
+ h+=`<div class="card"><h2>Page-1 keywords by topic</h2><div class="sub" style="margin-bottom:10px">From the full research list of ${nf(4341)} keywords.</div>${topicTable(tr,'z')}</div>`;
+ $('#s1').innerHTML=h;bars($('#c1'),z.map(x=>x[1]));bars($('#c2'),z.map(x=>x[0]))}
+function s2(){
+ const im=D.totals.lpim,p=cur-1,nk=D.newKw;
+ const tr=D.topics.filter(t=>sum(t.im)>0).sort((a,b)=>b.im[cur]-a.im[cur]||sum(b.im)-sum(a.im));
+ const named=M.map((_,i)=>sum(tr.map(t=>t.im[i]))),hidden=im.map((v,i)=>Math.max(v-named[i],0));
+ let h=`<div class="card"><h2>How often IPG shows up in Google</h2><div class="sub">Each time someone sees IPG in the search results counts as one impression. More impressions means more people can find IPG.</div></div>
+ <div class="tiles"><div class="tile"><div class="l">Times shown in ${FULLM[cur]}</div><div class="v">${nf(im[cur])}</div><div class="d">${chg(im[cur],im[p])}</div></div>
+ <div class="tile"><div class="l">New search terms</div><div class="v">${nf(nk.counts[cur])}</div><div class="d">${p>=1?chg(nk.counts[cur],nk.counts[p],{noPct:1}):'<span class="fl">baseline month</span>'}</div></div>
+ <div class="tile"><div class="l">Shown for those new terms</div><div class="v">${nf(nk.impr[cur])}</div><div class="d"><span class="fl">impressions from new terms</span></div></div></div>
+ <div class="grid2"><div class="card"><h3>Times shown in Google, by month</h3><div id="c3"></div></div><div class="card"><h3>New search terms found, by month</h3><div id="c4"></div></div></div>
+ <div class="card"><h2>Impressions by topic</h2><div class="sub" style="margin-bottom:10px">Every search is filed under the pump brand or pump type in it. Google hides very rare searches, so they appear in their own row.</div>${topicTable(tr,'im',`<tr><td>Rare searches Google hides</td>${hidden.map((x,i)=>`<td class="${i===cur?'sel':''}">${nf(x)}</td>`).join('')}<td>${cur?delta(hidden[cur],hidden[p]):'–'}</td></tr><tr class="tot"><td>Total</td>${im.map((x,i)=>`<td class="${i===cur?'sel':''}">${nf(x)}</td>`).join('')}<td>${cur?delta(im[cur],im[p]):'–'}</td></tr>`)}</div>`;
+ const bt=Object.entries(nk.byTopic).map(([n,x])=>({n,c:x.n[cur],i:x.im[cur]})).filter(x=>x.c>0).sort((a,b)=>b.i-a.i);
+ h+=`<div class="card"><h2>New search terms in ${FULLM[cur]}, by topic</h2><div class="sub" style="margin-bottom:10px">Search terms that showed IPG for the first time this year.</div>${cur===0?'<span class="sub">January is the starting point, so nothing counts as new yet.</span>':`<div class="grid2"><div class="tw"><table><thead><tr><th>Topic</th><th>New terms</th><th>Impressions</th></tr></thead><tbody>${bt.map(x=>`<tr><td>${esc(x.n)}</td><td>${nf(x.c)}</td><td>${nf(x.i)}</td></tr>`).join('')}<tr class="tot"><td>Total</td><td>${nf(nk.counts[cur])}</td><td>${nf(nk.impr[cur])}</td></tr></tbody></table></div><div><h3>Biggest new search terms</h3><ol class="list">${nk.top[cur].slice(0,10).map(x=>`<li><b>${esc(x.q)}</b> <span class="pill">${esc(x.t)}</span> <span class="sub">${nf(x.im)} impressions · position ${x.p}</span></li>`).join('')}</ol></div></div>`}</div>`;
+ $('#s2').innerHTML=h;bars($('#c3'),im);bars($('#c4'),nk.counts.map((v,i)=>i?v:0))}
+function s3(){
+ const cl=D.totals.lpcl,im=D.totals.lpim,p=cur-1;
+ let h=`<div class="seg" id="sg"><button data-i="0" aria-pressed="${sub3===0}">1 · Visitors we gained</button><button data-i="1" aria-pressed="${sub3===1}">2 · What visitors did</button><button data-i="2" aria-pressed="${sub3===2}">3 · Enquiries</button></div>`;
+ const ex=`<div class="note"><b>Example numbers.</b> Real engagement and enquiry figures need GA4 and form tracking, which are not connected to this report yet. The numbers on this page are illustrative: they follow the real visit counts but are not measured. Replace them before presenting as results.</div>`;
+ if(sub3===0){
+  const tp=D.pages.map(x=>({u:x.u,t:x.t,c:x.cl[cur],b:p>=0?x.cl[p]:null})).filter(x=>x.c>0).sort((a,b)=>b.c-a.c).slice(0,8);
+  const lt=D.ltopics.filter(t=>sum(t.cl)>0).sort((a,b)=>b.cl[cur]-a.cl[cur]||sum(b.cl)-sum(a.cl)).slice(0,14);
+  h+=`<div class="tiles"><div class="tile"><div class="l">Visits from Google</div><div class="v">${nf(cl[cur])}</div><div class="d">${chg(cl[cur],cl[p])}</div></div>
+  <div class="tile"><div class="l">Click rate</div><div class="v">${(cl[cur]/im[cur]*100).toFixed(1)}%</div><div class="d">${p>=0?chg(cl[cur]/im[cur]*100,cl[p]/im[p]*100,{unit:'pts'}):''}</div></div>
+  <div class="tile"><div class="l">Visits per day</div><div class="v">${(cl[cur]/DAYS[cur]).toFixed(1)}</div><div class="d"><span class="fl">average in ${FULLM[cur]}</span></div></div>
+  <div class="tile"><div class="l">Total this year</div><div class="v">${nf(sum(cl.slice(0,cur+1)))}</div><div class="d"><span class="fl">Jan–${M[cur]}</span></div></div></div>
+  <div class="card"><h3>Visits from Google, by month</h3><div id="c5"></div></div>
+  <div class="card"><h2>Visits by topic</h2><div class="sub" style="margin-bottom:10px">Pages grouped by the brand or pump type they are about.</div>${topicTable(lt,'cl')}</div>
+  <div class="card"><h2>Most visited pages in ${FULLM[cur]}</h2><div class="tw"><table><thead><tr><th>Page</th><th>Topic</th><th>Visits</th><th>vs ${p>=0?M[p]:'–'}</th></tr></thead><tbody>${tp.map(x=>`<tr><td>${esc(x.u)}</td><td style="text-align:left">${esc(x.t)}</td><td>${x.c}</td><td>${delta(x.c,x.b)}</td></tr>`).join('')}</tbody></table></div></div>`}
+ else if(sub3===1){
+  h+=ex+`<div class="tiles"><div class="tile"><div class="l">Visits (sessions) <span class="tag">example</span></div><div class="v">${nf(EX.sess[cur])}</div><div class="d">${chg(EX.sess[cur],EX.sess[p])}</div></div>
+  <div class="tile"><div class="l">Time on site <span class="tag">example</span></div><div class="v">${mmss(EX.dur[cur])}</div><div class="d">${chg(EX.dur[cur],EX.dur[p],{noPct:1,pctOnly:0,unit:''}).replace(/\d+(?= <\/span>)/,x=>x)}</div></div>
+  <div class="tile"><div class="l">Pages per visit <span class="tag">example</span></div><div class="v">${EX.pps[cur].toFixed(1)}</div><div class="d">${chg(EX.pps[cur],EX.pps[p],{dec:1,noPct:1})}</div></div>
+  <div class="tile"><div class="l">Engaged visits <span class="tag">example</span></div><div class="v">${EX.eng[cur].toFixed(0)}%</div><div class="d">${chg(EX.eng[cur],EX.eng[p],{unit:'pts'})}</div></div></div>
+  <div class="card"><h3>Average time on site (minutes:seconds) <span class="tag">example</span></h3><div id="c6"></div></div>
+  <div class="card"><h2>Month by month <span class="tag">example</span></h2>${mom([{l:'Visits (sessions)',v:EX.sess},{l:'Average time on site',v:EX.dur,f:mmss},{l:'Pages per visit',v:EX.pps,f:v=>v.toFixed(1),dec:1},{l:'Engaged visits (%)',v:EX.eng,f:v=>v.toFixed(0)+'%',dec:1}])}</div>`}
+ else{
+  const shares=D.ltopics.filter(t=>t.cl[cur]>0&&t.n!=='Other pages').sort((a,b)=>b.cl[cur]-a.cl[cur]).slice(0,6),tot=sum(shares.map(t=>t.cl[cur]))||1;
+  h+=ex+`<div class="tiles"><div class="tile"><div class="l">Enquiries <span class="tag">example</span></div><div class="v">${EX.enq[cur]}</div><div class="d">${chg(EX.enq[cur],EX.enq[p],{noPct:1})}</div></div>
+  <div class="tile"><div class="l">Visits that became an enquiry <span class="tag">example</span></div><div class="v">${EX.conv[cur].toFixed(1)}%</div><div class="d">${chg(EX.conv[cur],EX.conv[p],{unit:'pts'})}</div></div>
+  <div class="tile"><div class="l">Enquiries this year <span class="tag">example</span></div><div class="v">${sum(EX.enq.slice(0,cur+1))}</div><div class="d"><span class="fl">Jan–${M[cur]}</span></div></div></div>
+  <div class="card"><h3>Enquiries by month <span class="tag">example</span></h3><div id="c7"></div></div>
+  <div class="grid2"><div class="card"><h2>How people got in touch <span class="tag">example</span></h2>${mom([{l:'Contact form',v:EX.form},{l:'Quote request',v:EX.quote},{l:'Call button',v:EX.call},{l:'Total enquiries',v:EX.enq},{l:'Conversion rate (%)',v:EX.conv,f:v=>v.toFixed(1),dec:1}],'Type')}</div>
+  <div class="card"><h2>Where enquiries came from <span class="tag">example</span></h2><div class="sub" style="margin-bottom:8px">Shared out by each topic's real share of visits in ${FULLM[cur]}.</div><div class="tw"><table><thead><tr><th>Topic</th><th>Share of visits</th><th>Enquiries</th></tr></thead><tbody>${shares.map(t=>`<tr><td>${esc(t.n)}</td><td>${Math.round(t.cl[cur]/tot*100)}%</td><td>${(EX.enq[cur]*t.cl[cur]/tot).toFixed(1)}</td></tr>`).join('')}</tbody></table></div></div></div>`}
+ $('#s3').innerHTML=h;
+ if($('#c5'))bars($('#c5'),cl);if($('#c6'))bars($('#c6'),EX.dur,mmss);if($('#c7'))bars($('#c7'),EX.enq);
+ $('#sg').onclick=e=>{const b=e.target.closest('button');if(b){sub3=+b.dataset.i;s3()}}}
+function s4(){
+ const ST=[['tofu','TOFU · Get found','Reach people who are still researching. Think guides, keyword research and new topics.'],['mofu','MOFU · Convince','Help people compare and trust IPG. Think brand pages, product pages and links between pages.'],['bofu','BOFU · Win the enquiry','Make it easy to ask for a quote. Think clear buttons, forms and the pages closest to a sale.'],['tech','Tech · Keep the site healthy','Make sure Google can read the site: crawls, sitemaps, speed and structured data.']];
+ const sel=WORK.filter(w=>work===1||w.m===cur);
+ let h=`<div class="seg" id="sw"><button data-i="0" aria-pressed="${work===0}">${FULLM[cur]} only</button><button data-i="1" aria-pressed="${work===1}">All year</button></div>
+ <div class="card"><h2>What we worked on</h2><div class="sub">Sorted by where the work helps the customer journey. Built from the files saved in the IPG SEO folder, so check it and add anything that was not saved as a file.</div></div><div class="tiles">`+ST.map(([k,t])=>`<div class="tile"><div class="l">${t.split(' · ')[0]}</div><div class="v">${sel.filter(w=>w.s===k).length}</div><div class="d fl">${work?'all year':FULLM[cur]}</div></div>`).join('')+`<div class="tile"><div class="l">Pages newly in Google</div><div class="v">${cur?newPages(cur).length:'–'}</div><div class="d fl">${FULLM[cur]}</div></div></div><div class="grid2">`;
+ ST.forEach(([k,t,why])=>{const it=sel.filter(w=>w.s===k);h+=`<div class="card stage"><h3>${t}</h3><div class="why">${why}</div>${it.length?'<ul>'+it.map(w=>`<li>${esc(w.t)} <small>· ${work?FULLM[w.m].slice(0,3)+' ':''}${esc(w.d)}</small></li>`).join('')+'</ul>':'<span class="sub">Nothing saved for this month.</span>'}</div>`});
+ h+='</div>';
+ if(cur>0){const np=newPages(cur),bt={};np.forEach(p=>bt[p.t]=(bt[p.t]||0)+1);const rows=Object.entries(bt).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  if(rows.length)h+=`<div class="card"><h2>New pages Google started showing in ${FULLM[cur]}</h2><div class="sub" style="margin-bottom:8px">${np.length} pages in total, grouped by topic.</div>${rows.map(([n,c])=>`<span class="pill" style="margin:0 6px 6px 0">${esc(n)} · ${c}</span>`).join('')}</div>`}
+ $('#s4').innerHTML=h;$('#sw').onclick=e=>{const b=e.target.closest('button');if(b){work=+b.dataset.i;s4()}}}
+render();
+</script>
+</body>
+</html>
